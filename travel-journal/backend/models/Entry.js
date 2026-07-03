@@ -2,6 +2,11 @@ const mongoose = require('mongoose');
 
 const entrySchema = new mongoose.Schema(
   {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
     title: {
       type: String,
       required: true,
@@ -11,12 +16,17 @@ const entrySchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
-    date: {
+    startDate: {
       type: Date,
-      default: Date.now,
+      required: true,
+    },
+    endDate: {
+      type: Date,
+      required: true,
     },
     location: {
       type: String,
+      required: true,
       trim: true,
     },
     coordinates: {
@@ -35,10 +45,14 @@ const entrySchema = new mongoose.Schema(
       type: Number,
       min: 1,
       max: 5,
+      default: 5,
     },
     tags: [String],
   },
   { timestamps: true }
 );
+
+// Index for user queries
+entrySchema.index({ userId: 1, startDate: -1 });
 
 module.exports = mongoose.model('Entry', entrySchema);

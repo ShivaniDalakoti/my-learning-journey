@@ -1,13 +1,40 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
+import { AuthContext } from './context/AuthContext';
 import JournalFeed from './components/JournalFeed';
 import EntryForm from './components/EntryForm';
 import MapView from './components/MapView';
+import LoginForm from './components/LoginForm';
+import SignupForm from './components/SignupForm';
 import './App.css';
 
 function App() {
-  const [page, setPage] = useState('feed'); // feed, add-entry, map, detail
+  const { user, token, logout, loading } = useContext(AuthContext);
+  const [page, setPage] = useState('feed');
+  const [authPage, setAuthPage] = useState('login');
   const [selectedEntryId, setSelectedEntryId] = useState(null);
   const [entries, setEntries] = useState([]);
+
+  if (loading) {
+    return <div className="loading-screen">Loading...</div>;
+  }
+
+  if (!user || !token) {
+    return (
+      <div className="auth-container">
+        {authPage === 'login' ? (
+          <LoginForm
+            onSuccess={() => setPage('feed')}
+            onSwitchToSignup={() => setAuthPage('signup')}
+          />
+        ) : (
+          <SignupForm
+            onSuccess={() => setPage('feed')}
+            onSwitchToLogin={() => setAuthPage('login')}
+          />
+        )}
+      </div>
+    );
+  }
 
   const handleAddEntry = () => {
     setPage('add-entry');
@@ -29,6 +56,7 @@ function App() {
         method,
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(entryData),
       });
@@ -38,7 +66,6 @@ function App() {
       }
 
       setPage('feed');
-      // Refresh entries
       await fetchEntries();
     } catch (error) {
       throw error;
@@ -47,7 +74,11 @@ function App() {
 
   const fetchEntries = async () => {
     try {
-      const response = await fetch('/api/entries');
+      const response = await fetch('/api/entries', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const data = await response.json();
       setEntries(data);
     } catch (error) {
@@ -85,6 +116,15 @@ function App() {
             >
               + New Entry
             </button>
+            <div className="nav-user">
+              <span className="user-name">{user.username}</span>
+              <button
+                className="nav-link nav-logout"
+                onClick={logout}
+              >
+                Logout
+              </button>
+            </div>
           </div>
         </div>
       </nav>

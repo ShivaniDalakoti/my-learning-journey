@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import ImageUpload from './ImageUpload';
 import './EntryForm.css';
 
 function EntryForm({ initialData, onSubmit, onCancel }) {
@@ -284,6 +285,13 @@ function EntryForm({ initialData, onSubmit, onCancel }) {
           </div>
         )}
       </div>
+
+      <ImageUpload
+        onPhotosChange={(photos) =>
+          setFormData({ ...formData, photos })
+        }
+        initialPhotos={formData.photos}
+      />
 
       <div className="form-actions">
         <button

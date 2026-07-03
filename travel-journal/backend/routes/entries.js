@@ -1,11 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const Entry = require('../models/Entry');
+const { authMiddleware } = require('../middleware/auth');
 
-// Get all entries
-router.get('/', async (req, res) => {
+// Get all entries for current user
+router.get('/', authMiddleware, async (req, res) => {
   try {
-    const entries = await Entry.find().sort({ date: -1 });
+    const entries = await Entry.find({ userId: req.userId })
+      .sort({ startDate: -1 });
     res.json(entries);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -13,10 +15,16 @@ router.get('/', async (req, res) => {
 });
 
 // Get single entry
-router.get('/:id', async (req, res) => {
+router.get('/:id', authMiddleware, async (req, res) => {
   try {
     const entry = await Entry.findById(req.params.id);
     if (!entry) return res.status(404).json({ message: 'Entry not found' });
+
+    // Check ownership
+    if (entry.userId.toString() !== req.userId) {
+      return res.status(403).json({ message: 'Not authorized' });
+    }
+
     res.json(entry);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -24,8 +32,12 @@ router.get('/:id', async (req, res) => {
 });
 
 // Create entry
-router.post('/', async (req, res) => {
-  const entry = new Entry(req.body);
+router.post('/', authMiddleware, async (req, res) => {
+  const entry = new Entry({
+    ...req.body,
+    userId: req.userId,
+  });
+
   try {
     const newEntry = await entry.save();
     res.status(201).json(newEntry);
@@ -35,10 +47,15 @@ router.post('/', async (req, res) => {
 });
 
 // Update entry
-router.put('/:id', async (req, res) => {
+router.put('/:id', authMiddleware, async (req, res) => {
   try {
     const entry = await Entry.findById(req.params.id);
     if (!entry) return res.status(404).json({ message: 'Entry not found' });
+
+    // Check ownership
+    if (entry.userId.toString() !== req.userId) {
+      return res.status(403).json({ message: 'Not authorized' });
+    }
 
     Object.assign(entry, req.body);
     const updatedEntry = await entry.save();
@@ -49,10 +66,17 @@ router.put('/:id', async (req, res) => {
 });
 
 // Delete entry
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', authMiddleware, async (req, res) => {
   try {
-    const entry = await Entry.findByIdAndDelete(req.params.id);
+    const entry = await Entry.findById(req.params.id);
     if (!entry) return res.status(404).json({ message: 'Entry not found' });
+
+    // Check ownership
+    if (entry.userId.toString() !== req.userId) {
+      return res.status(403).json({ message: 'Not authorized' });
+    }
+
+    await Entry.findByIdAndDelete(req.params.id);
     res.json({ message: 'Entry deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: error.message });
