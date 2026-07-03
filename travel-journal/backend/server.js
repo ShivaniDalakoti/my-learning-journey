@@ -21,10 +21,16 @@ db.once('open', () => {
   console.log('Connected to MongoDB');
 });
 
+// Import routes
+const entriesRouter = require('./routes/entries');
+
 // Routes
 app.get('/api/health', (req, res) => {
   res.json({ status: 'Backend is running' });
 });
+
+// Entry routes
+app.use('/api/entries', entriesRouter);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
