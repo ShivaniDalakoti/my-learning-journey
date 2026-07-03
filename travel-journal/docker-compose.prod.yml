@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  db:
+    image: mongo:latest
+    container_name: travel-journal-db-prod
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_prod_data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: travel-journal
+    networks:
+      - travel-journal-prod
+    restart: unless-stopped
+
+  app:
+    build: .
+    container_name: travel-journal-app-prod
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+    environment:
+      MONGODB_URI: mongodb://db:27017/travel-journal
+      NODE_ENV: production
+      PORT: 5000
+      JWT_SECRET: ${JWT_SECRET}
+    networks:
+      - travel-journal-prod
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  nginx:
+    image: nginx:alpine
+    container_name: travel-journal-nginx-prod
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - app
+    networks:
+      - travel-journal-prod
+    restart: unless-stopped
+
+volumes:
+  mongodb_prod_data:
+
+networks:
+  travel-journal-prod:
+    driver: bridge

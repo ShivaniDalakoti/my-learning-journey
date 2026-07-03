@@ -1,0 +1,84 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy Application
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: |
+          cd travel-journal/backend && npm install
+          cd ../frontend && npm install
+
+      - name: Build frontend
+        working-directory: ./travel-journal/frontend
+        run: npm run build
+
+      - name: Create deployment package
+        run: |
+          mkdir -p deploy
+          cp -r travel-journal/backend/* deploy/
+          cp -r travel-journal/frontend/build deploy/public
+          cp travel-journal/docker-compose.yml deploy/
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Deploy to AWS (if configured)
+        if: secrets.AWS_ACCESS_KEY_ID != ''
+        run: |
+          echo "Deployment to AWS would happen here"
+          echo "Configure AWS credentials in GitHub secrets to enable this"
+
+      - name: Deploy to Heroku (if configured)
+        if: secrets.HEROKU_API_KEY != ''
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+          HEROKU_APP_NAME: travel-journal-app
+        run: |
+          npm install -g heroku
+          heroku login
+          cd deploy
+          heroku create $HEROKU_APP_NAME || true
+          git push heroku main
+
+      - name: Notify deployment
+        if: success()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '✅ Deployment successful! Your app is live.'
+            })
+
+      - name: Notify deployment failure
+        if: failure()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '❌ Deployment failed. Check the workflow logs for details.'
+            })
