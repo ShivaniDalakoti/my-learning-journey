@@ -1,0 +1,72 @@
+.App {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.App-header {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 40px 20px;
+  text-align: center;
+  color: white;
+}
+
+.App-header h1 {
+  font-size: 48px;
+  margin-bottom: 10px;
+}
+
+.App-header p {
+  font-size: 18px;
+  opacity: 0.9;
+}
+
+main {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.status {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 30px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.features {
+  background: white;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.features h2 {
+  margin-bottom: 20px;
+  color: #667eea;
+}
+
+.features ul {
+  list-style: none;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.features li {
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  font-size: 16px;
+}
+
+@media (max-width: 600px) {
+  .App-header h1 {
+    font-size: 32px;
+  }
+
+  .features ul {
+    grid-template-columns: 1fr;
+  }
+}

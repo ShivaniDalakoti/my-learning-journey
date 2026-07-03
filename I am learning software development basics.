@@ -1,1 +1,91 @@
-# my-learning-journey
+# My Learning Journey
+
+A comprehensive repository documenting my software development learning path with hands-on projects.
+
+## Projects
+
+### 1. Travel Journal App (MERN Stack)
+A full-stack web application for documenting and sharing travel adventures.
+
+**Technologies:**
+- Frontend: React.js
+- Backend: Node.js + Express
+- Database: MongoDB
+- Deployment: Docker
+
+**Features:**
+- Create and manage journal entries
+- Upload photos
+- Track locations on a map
+- Rate and tag trips
+
+**Status:** In Development
+
+**Get Started:**
+```bash
+cd travel-journal
+docker-compose up
+```
+
+Access:
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:5000
+
+## Learning Goals
+
+- ✅ Build full-stack web applications
+- ✅ Learn MERN stack (MongoDB, Express, React, Node)
+- ✅ Master Git and GitHub workflows
+- ✅ Implement RESTful APIs
+- ✅ Work with databases
+- ✅ Containerize applications with Docker
+- 🔄 Design UI/UX in Figma
+- 🔄 Write tests and maintain code quality
+- 🔄 Deploy to production
+
+## Project Structure
+
+```
+my-learning-journey/
+└── travel-journal/          # Main MERN project
+    ├── frontend/            # React app
+    ├── backend/             # Express API
+    ├── docs/                # Documentation
+    ├── docker-compose.yml   # Docker setup
+    └── README.md            # Project details
+```
+
+## Getting Started
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/ShivaniDalakoti/my-learning-journey.git
+   cd my-learning-journey
+   ```
+
+2. **Navigate to a project:**
+   ```bash
+   cd travel-journal
+   ```
+
+3. **Follow the project-specific README or SETUP.md for detailed instructions**
+
+## Resources
+
+- [Travel Journal README](./travel-journal/README.md) - Project overview
+- [Setup Guide](./travel-journal/docs/SETUP.md) - Installation and configuration
+- [Architecture](./travel-journal/docs/ARCHITECTURE.md) - System design
+
+## Contributing
+
+This is a personal learning repository, but feel free to fork and create your own version!
+
+## Author
+
+**Shivani Dalakoti**
+- GitHub: [@ShivaniDalakoti](https://github.com/ShivaniDalakoti)
+- Email: shivaniinavihs96@gmail.com
+
+## License
+
+MIT
